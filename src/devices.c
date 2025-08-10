@@ -51,9 +51,11 @@ static void gpio_init()
 
     gpio_set_mode(key_io, gpio_mode_input);
     gpio_set_mode(sys_on, gpio_mode_output_pushpull);
-    gpio_set_mode(sys_dwn, gpio_mode_output_pushpull);
-    gpio_set_level(sys_on, 0);
-    gpio_set_level(sys_dwn, 0);
+    gpio_set_mode(sys_dwn_active_h, gpio_mode_output_pushpull);
+    gpio_set_mode(sys_dwn_active_l, gpio_mode_output_pushpull);
+    gpio_set_level(sys_on, 0); // 默认关机
+    gpio_set_level(sys_dwn_active_h, 0);
+    gpio_set_level(sys_dwn_active_l, 1);
 
     gpio_set_mode(led_io, gpio_mode_output_pushpull);
     gpio_set_level(led_io, 0);
@@ -88,6 +90,14 @@ static void sys_tic_set(uint32_t sys_frq)
     SysTick_Config(stcCfg.u32LoadVal);
 }
 
+
+void ticker_timeout_cb(void *arg)
+{
+    // 延时结束，进入休眠模式
+    // devices_deep_sleep_start();
+    printf("(try dss...)\n");
+}
+
 void devices_init(void)
 {
     // Clk_SetFunc(ClkFuncSwdPinIOEn, 1); // 关闭SWD接口
@@ -104,33 +114,36 @@ void devices_init(void)
     iic_init();                              // 初始化iic
     btn_attach_read_io_func(gpio_get_level); // 初始化按键接口
     btn_attach(key_io, 0);                   // 注册按键
+
 }
 
 void devices_deep_sleep_start() // 开始休眠
 {
+    printf("(devices_deep_sleep_start...)\n");
     gpio_set_mode(txd1_io, gpio_mode_input_pullup); // 关串口
     gpio_set_irq(key_io, GpioIrqFalling, 1);        // 打开按键唤醒中断
-    // gpio_set_irq(usb_in_io, GpioIrqRising, 1);      // 打开USB唤醒中断
-
+    
     Lpm_GotoLpmMode(); // 进入休眠
-
     // 唤醒
     while (Clk_GetClkRdy(ClkRCH) == 0) // 等待时钟稳定
         ;
     gpio_set_irq(key_io, GpioIrqFalling, 0);   // 关闭按键中断
-    // gpio_set_irq(usb_in_io, GpioIrqRising, 0); // 关闭USB唤醒中断
 
     gpio_set_mode(txd1_io, gpio_mode_output_pushpull); // 切为输出
     gpio_set_level(txd1_io, 0);                        // 拉低唤醒ESP32
     gpio_set_level(txd1_io, 1);
-
-    Gpio_SetFunc_UART1TX_P23(); // 开串口
+    Gpio_SetFunc_UART1TX_P35(); // 开串口
+    ticker_delay(10); // 等待串口稳定
+    // systemWakeUp();
+    // printf("(out of sleep...)\n");
 }
 
 void Gpio_IRQHandler(uint8_t u8Param)
 {
     *((uint32_t *)((uint32_t)&M0P_GPIO->P0ICLR + 3 * 0x40)) = 0; // 清P3中断
     *((uint32_t *)((uint32_t)&M0P_GPIO->P0ICLR)) = 0;            // P0
+
+    // *((uint32_t *)((uint32_t)&M0P_GPIO->P2ICLR + 2 * 0x40)) = 0; // 清P26中断
 }
 
 void per_motor_set(uint8_t duty)

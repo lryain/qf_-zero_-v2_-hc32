@@ -1,34 +1,60 @@
 #include "tasks.h"
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
+
+// 关机延时（ms），非CM4建议5000~10000ms
+#define SHUTDOWN_DELAY_MS 8000
+
+// 系统状态变量
+static uint8_t system_state = 0; // 0关机，1开机
+static uint8_t shutdown_pending = 0;
+static uint8_t cm4_flag = 0; // 1为CM4，0为其它型号
+static uint32_t shutdown_timer = 0;
 
 
 static void btn_task()
 {
     static btn_event_t ret;
-    if (btn_available() && gpio_get_level(key_io) == 1)
+    // if (btn_available() && gpio_get_level(key_io) == 1)
+    if (btn_available())
     {
         btn_read_event(NULL, &ret);
         switch (ret)
         {
-        // case btn_down:
-        //     printf("(btn_down)\n");
-        //     break;
-        // case btn_up:
-        //     printf("(btn_up)\n");
-        //     break;
         case btn_click:
-            printf("(click)\n");
+            // printf("(click)\n");
+            if (system_state == 0) { // 关机状态
+                printf("(power on)\n");
+                gpio_set_level(sys_on, 1); // 上电
+                gpio_set_level(sys_dwn_active_l, 0);
+                ticker_delay(500);
+                gpio_set_level(sys_dwn_active_l, 1);
+                system_state = 1;
+            }
             break;
         case btn_double_click:
-            printf("(double)\n");
-            break;
-        case btn_triple_click:
-            printf("(triple)\n");
+            if (system_state == 1) { // 开机状态
+                printf("(power off)\n");
+                // 通知树莓派关机
+                gpio_set_level(sys_dwn_active_h, 1);
+                gpio_set_level(sys_dwn_active_l, 0);
+                shutdown_pending = 1;
+                shutdown_timer = ticker_get_time_ms();
+            }
             break;
         case btn_long_press:
             printf("(long)\n");
             break;
         case btn_long_press_8s:
-            printf("(long_8s)\n");
+            if (system_state == 1) { // 开机状态
+                printf("(force power off)\n");
+                gpio_set_level(sys_on, 0); // 强制断电
+                system_state = 0;
+                shutdown_pending = 0;
+                // 立即返回，防止关机流程继续
+                return;
+            }
             break;
         default:
             break;
@@ -51,8 +77,38 @@ void tasks_init()
     ticker_attch_ms(1, btn_task, 0, "btn", NULL); // 1ms上报一次数据
 }
 
-
 void task_loop_handler()
 {
     ticker_task_handler();
+    if (shutdown_pending) {
+        // 关机信号保持一段时间后拉低
+        if (ticker_get_time_ms() - shutdown_timer > 800) {
+            gpio_set_level(sys_dwn_active_h, 0); // 关机信号拉低
+            gpio_set_level(sys_dwn_active_l, 1); // 关机信号拉高
+        }
+        if (system_state == 0) {
+            // 已经断电，直接清除关机流程
+            shutdown_pending = 0;
+            return;
+        }
+        if (cm4_flag) {
+            // 检测CM4关机完成引脚
+            if (gpio_get_level(pi_shutdown_done_pin) == 0) {
+                gpio_set_level(sys_on, 0); // 断电
+                shutdown_pending = 0;
+                system_state = 0;
+                // 关机完成，进入低功耗模式
+                // devices_deep_sleep_start();
+            }
+        } else {
+            // 非CM4，延时关机
+            if (ticker_get_time_ms() - shutdown_timer > SHUTDOWN_DELAY_MS) {
+                gpio_set_level(sys_on, 0); // 断电
+                shutdown_pending = 0;
+                system_state = 0;
+                // 关机完成，进入低功耗模式
+                // devices_deep_sleep_start();
+            }
+        }
+    }
 }

@@ -72,9 +72,14 @@ static void tic_cb(ticker_event_t *e)
         uint8_t tmp;
         ring_buffer_read(ring_buffer, &tmp);
         trans_packer_push_byte(handle, tmp);
-    }
+        // 转换成字符串输出，而不是16进制
+        char str[3];
+        sprintf(str, "%c", tmp);
+        printf("%s", str);
 
-    if (trans_packer_get_pack_num(handle)) // 编解码器接收到可用包
+    }
+    size_t result = trans_packer_get_pack_num(handle); // 获取编解码器接收到的包数量
+    if (result > 0) // 编解码器接收到可用包
     {
         const char *name;
         uint8_t *dat;
@@ -166,21 +171,12 @@ static void uart_init()
     DDL_ZERO_STRUCT(stcBaud);
     DDL_ZERO_STRUCT(stcBtConfig);
 
-#if uart_printf_to_usb
-    gpio_set_mode(txd0_io, gpio_mode_output_pushpull);
-    gpio_set_mode(rxd0_io, gpio_mode_input_pullup);
-
-    // 通道端口配置
-    Gpio_SetFunc_UART1TX_P35();
-    Gpio_SetFunc_UART1RX_P36();
-#else
     gpio_set_mode(txd1_io, gpio_mode_output_pushpull);
     gpio_set_mode(rxd1_io, gpio_mode_input);
     // Gpio_SetFunc_UART1TX_P23();
     // Gpio_SetFunc_UART1RX_P24();
     Gpio_SetFunc_UART1TX_P35();
     Gpio_SetFunc_UART1RX_P36();
-#endif
 
     // 外设时钟使能
     Clk_SetPeripheralGate(ClkPeripheralBt, TRUE);    // 定时器0时钟使能 模式0/2可以不使能
@@ -217,18 +213,14 @@ static void uart_init()
     Uart_DisableIrq(UARTCH1, UartTxIrq); // 关闭发送中断
     Uart_EnableFunc(UARTCH1, UartRx);    // 使能接收中断
 
-    ring_buffer = ring_buffer_create(sample_8bit, 64);
+    ring_buffer = ring_buffer_create(sample_8bit, 128);
 }
 
 void esp_trans_init()
 {
     uart_init();
-// #if !uart_printf_to_usb
-//     gpio_set_mode(txd0_io, gpio_mode_input);
-//     gpio_set_mode(rxd0_io, gpio_mode_input);
-// #endif
     ticker_attch_ms(1, tic_cb, 0, NULL, NULL);
 
-    handle = trans_packer_creat_trans(24, 64, look_cmd);
+    handle = trans_packer_creat_trans(24, 128, look_all);
     trans_packer_set_write_cb(handle, uart_write_bytes);
 }

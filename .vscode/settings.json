@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "*.ino": "arduino",
         "string": "c",
         "stdlib.h": "c",
         "cw2015.h": "c",
@@ -14,6 +15,13 @@
         "hc32l110.h": "c",
         "trans_task.h": "c",
         "core_cm0plus.h": "c",
-        "ring_buffer.h": "c"
+        "ring_buffer.h": "c",
+        "my_api.h": "c",
+        "trans_packer.h": "c",
+        "ticker.h": "c",
+        "string.h": "c",
+        "eeprom.h": "c",
+        "bmp280.h": "c",
+        "tasks.h": "c"
     }
 }

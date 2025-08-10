@@ -28,9 +28,9 @@ extern "C"
 #if trans_packer_compile_en
 
 #define cmd_monitor_en 1    // 指令监视使能
-#define string_monitor_en 0 // 字符串监视使能 格式如：#@!time=230520215530\n  #@!为识别头 time为指令 = 后面接字符串数据，以\n结束
+#define string_monitor_en 1 // 字符串监视使能 格式如：#@!time=230520215530\n  #@!为识别头 time为指令 = 后面接字符串数据，以\n结束
 
-#define trans_packer_debug_log 0           // 是否打印日志
+#define trans_packer_debug_log 1           // 是否打印日志
 #define trans_packer_log_printf_use printf // 格式化打印函数名
 
 #define trans_packer_malloc(x) malloc(x)

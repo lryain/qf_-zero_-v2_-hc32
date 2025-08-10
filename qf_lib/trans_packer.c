@@ -292,7 +292,7 @@ void trans_packer_send_pack_fmt(trans_packer_handle_t *handle, const char *name,
 
 static void _trans_write_pack_cmd(trans_packer_handle_t *handle)
 {
-    //printf("c%d\n",sizeof(trans_get_pack_t));
+    printf("c%d\n",sizeof(trans_get_pack_t));
     trans_get_pack_t *tmp = trans_packer_malloc(sizeof(trans_get_pack_t));
     size_t i;
     if (tmp == NULL)
@@ -307,7 +307,7 @@ static void _trans_write_pack_cmd(trans_packer_handle_t *handle)
     if (handle->name_lenth)
     {
         handle->name_lenth += 1;
-        //printf("a%d\n",handle->name_lenth);
+        printf("a%d\n",handle->name_lenth);
         tmp->name_str = trans_packer_malloc(handle->name_lenth);
         if (tmp->name_str == NULL)
         {
@@ -326,7 +326,7 @@ static void _trans_write_pack_cmd(trans_packer_handle_t *handle)
 
     if (handle->data_lenth)
     {
-        //printf("b%d\n",handle->data_lenth);
+        printf("b%d\n",handle->data_lenth);
         tmp->dat_buffer = trans_packer_malloc(handle->data_lenth);
         if (tmp->dat_buffer == NULL)
         {
@@ -435,7 +435,6 @@ static void _trans_write_pack_string(trans_packer_handle_t *handle)
 
 static void look_at_cmd_trans(trans_packer_handle_t *handle, uint8_t dat)
 {
-
     // 6 134 247 name_len name len_h len_l data crc_h crc_l
 
     ///////////////////////head///////////////////
@@ -710,8 +709,10 @@ static void look_at_string_trans(trans_packer_handle_t *handle, uint8_t dat)
 void trans_packer_push_byte(trans_packer_handle_t *handle, uint8_t dat)
 {
 #if cmd_monitor_en
-    if (handle->look_at_en & look_cmd)
+    // printf("trans_packer_push_byte\n");
+    if (handle->look_at_en & look_cmd){
         look_at_cmd_trans(handle, dat);
+    }
 #endif
 #if string_monitor_en
     if (handle->look_at_en & look_string)

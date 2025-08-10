@@ -18,11 +18,6 @@ static uint8_t long_short_sent[BUTTON_NUM] = {0}; // 长按短事件已发送标
 static uint8_t double_flg[BUTTON_NUM] = {0};
 static uint16_t button_double_t[BUTTON_NUM] = {0}; // 双击扫描计时
 #endif
-#if btn_triple_click_en
-static uint8_t triple_flg[BUTTON_NUM] = {0};
-static uint16_t button_triple_t[BUTTON_NUM] = {0}; // 三连击扫描计时
-static uint8_t triple_count[BUTTON_NUM] = {0};     // 三连击计数
-#endif
 
 static btn_event_t button_event_ret[BUTTON_BUFFER_NUM] = {btn_not_press}; // 缓冲区事件
 static uint8_t button_event_io[BUTTON_BUFFER_NUM] = {0};      // 缓冲区io口数字
@@ -148,7 +143,7 @@ void btn_tic_ms(uint8_t _ms)
         }
 
         ////////////////////////////////////////////////////////////
-
+// #1 if
         if (button_now_level[i] == button_trig_level[i]) // 按键按下
         {
             if (change_flg == 1) // 按键翻转
@@ -179,32 +174,19 @@ void btn_tic_ms(uint8_t _ms)
                     }
                 }
 #endif
-#if btn_triple_click_en
-                if (triple_flg[i] == 0) {
-                    triple_flg[i] = 1;
-                    button_triple_t[i] = 0;
-                    triple_count[i] = 1;
-                } else if (triple_flg[i] == 1) {
-                    triple_count[i]++;
-                    button_triple_t[i] = 0;
-                    if (triple_count[i] == 3) {
-                        button_write_buffer(button_io_num[i], btn_triple_click);
-                        triple_flg[i] = 2;
-                    }
-                }
-#endif
             }
             //////////////////////////////////////////////////////////////////////////
 #if btn_long_press_en             // 使能长按
             if (long_flg[i] == 1) // 长按计时中
             {
                 button_long_t[i] += _ms;
-                // 只在达到8秒时触发8秒长按
-                if (button_long_t[i] >= btn_long_press_8s_default)
+                // 只在达到8秒时触发8秒长按，且只触发一次
+                if (button_long_t[i] >= btn_long_press_8s_default && long_short_sent[i] == 0)
                 {
                     button_write_buffer(button_io_num[i], btn_long_press_8s);
+                    printf("(1. w ---> long_8s)\n");
                     long_flg[i] = 0;
-                    long_short_sent[i] = 0;
+                    long_short_sent[i] = 1;
                 }
             }
 #endif
@@ -224,7 +206,7 @@ void btn_tic_ms(uint8_t _ms)
                 }
             }
 #endif
-        }                         ///////////////////////////////////////////////////////////////////
+        }    // #1 if                     ///////////////////////////////////////////////////////////////////
         else if (change_flg == 1) // 弹起
         {
 #if btn_long_press_trig_en // 长按触发事件
@@ -245,6 +227,7 @@ void btn_tic_ms(uint8_t _ms)
                 if (long_flg[i] == 1 && button_long_t[i] >= btn_long_press_time_default && button_long_t[i] < btn_long_press_8s_default)
                 {
                     button_write_buffer(button_io_num[i], btn_long_press);
+                    printf("(2. w ---> btn_long_press)\n");
                 }
                 long_flg[i] = 0;
                 button_long_t[i] = 0;
@@ -292,23 +275,6 @@ void btn_tic_ms(uint8_t _ms)
 #endif
                 double_flg[i] = 0;
             }
-        }
-#endif
-#if btn_triple_click_en         // 启用三连击
-        if (triple_flg[i] == 1)
-        {
-            button_triple_t[i] += _ms;
-            if (button_triple_t[i] >= btn_triple_click_time_default)
-            {
-                triple_flg[i] = 0;
-                triple_count[i] = 0;
-            }
-        }
-        // 检测到三连击后，状态复位
-        if (triple_flg[i] == 2)
-        {
-            triple_flg[i] = 0;
-            triple_count[i] = 0;
         }
 #endif
     }

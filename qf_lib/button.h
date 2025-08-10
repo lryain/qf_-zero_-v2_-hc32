@@ -81,12 +81,11 @@ extern "C"
 
 //  下列选项可以让程序在编译时就不启用这些功能节省空间  1启用 0停用
 //  同时，还提供了接口可以动态 屏蔽、启用 已开启编译的功能，以实现丰富且便捷的交互操作
-#define btn_down_en 1            //按下编译使能
-#define btn_up_en 1              //弹起编译使能
+#define btn_down_en 0            //按下编译使能
+#define btn_up_en 0              //弹起编译使能
 #define btn_long_press_en 1      //长按编译使能
 #define btn_click_en 1           //单击编译使能
 #define btn_double_click_en 1    //双击编译使能
-#define btn_triple_click_en 1    //3连击编译使能
 #define btn_long_press_trig_en 0 //长按时连续触发编译使能
 
     typedef enum
