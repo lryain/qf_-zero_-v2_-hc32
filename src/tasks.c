@@ -12,6 +12,13 @@ static uint8_t shutdown_pending = 0;
 static uint8_t cm4_flag = 0; // 1为CM4，0为其它型号
 static uint32_t shutdown_timer = 0;
 
+// 定义一个函数来恢复高电平
+void sys_dwn_active_l_delay(void)
+{
+    gpio_set_level(sys_dwn_active_l, 0); // 恢复高电平
+    ticker_delay(300);
+    gpio_set_level(sys_dwn_active_l, 1); // 恢复高电平
+}
 
 static void btn_task()
 {
@@ -27,18 +34,17 @@ static void btn_task()
             if (system_state == 0) { // 关机状态
                 printf("(power on)\n");
                 gpio_set_level(sys_on, 1); // 上电
-                gpio_set_level(sys_dwn_active_l, 0);
-                ticker_delay(500);
-                gpio_set_level(sys_dwn_active_l, 1);
                 system_state = 1;
+                sys_dwn_active_l_delay(); // 延时恢复高电平
             }
             break;
         case btn_double_click:
             if (system_state == 1) { // 开机状态
                 printf("(power off)\n");
                 // 通知树莓派关机
-                gpio_set_level(sys_dwn_active_h, 1);
-                gpio_set_level(sys_dwn_active_l, 0);
+                gpio_set_level(sys_dwn_active_l, 0); // 输出低电平
+                sys_dwn_active_l_delay(); // 延时恢复高电平
+
                 shutdown_pending = 1;
                 shutdown_timer = ticker_get_time_ms();
             }
@@ -83,9 +89,9 @@ void task_loop_handler()
     if (shutdown_pending) {
         // 关机信号保持一段时间后拉低
         if (ticker_get_time_ms() - shutdown_timer > 800) {
-            gpio_set_level(sys_dwn_active_h, 0); // 关机信号拉低
-            gpio_set_level(sys_dwn_active_l, 1); // 关机信号拉高
+            // gpio_set_level(sys_dwn_active_l, 0); // 关机信号拉高
         }
+
         if (system_state == 0) {
             // 已经断电，直接清除关机流程
             shutdown_pending = 0;
@@ -111,4 +117,5 @@ void task_loop_handler()
             }
         }
     }
+    
 }

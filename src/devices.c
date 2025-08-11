@@ -51,10 +51,10 @@ static void gpio_init()
 
     gpio_set_mode(key_io, gpio_mode_input);
     gpio_set_mode(sys_on, gpio_mode_output_pushpull);
-    gpio_set_mode(sys_dwn_active_h, gpio_mode_output_pushpull);
+    // gpio_set_mode(sys_dwn_active_h, gpio_mode_output_pushpull);
     gpio_set_mode(sys_dwn_active_l, gpio_mode_output_pushpull);
     gpio_set_level(sys_on, 0); // 默认关机
-    gpio_set_level(sys_dwn_active_h, 0);
+    // gpio_set_level(sys_dwn_active_h, 0);
     gpio_set_level(sys_dwn_active_l, 1);
 
     gpio_set_mode(led_io, gpio_mode_output_pushpull);
@@ -88,14 +88,6 @@ static void sys_tic_set(uint32_t sys_frq)
     stcCfg.u32LoadVal = sys_frq / 1000 - 1; // 1ms
     Clk_SysTickConfig(&stcCfg);
     SysTick_Config(stcCfg.u32LoadVal);
-}
-
-
-void ticker_timeout_cb(void *arg)
-{
-    // 延时结束，进入休眠模式
-    // devices_deep_sleep_start();
-    printf("(try dss...)\n");
 }
 
 void devices_init(void)
@@ -135,7 +127,7 @@ void devices_deep_sleep_start() // 开始休眠
     Gpio_SetFunc_UART1TX_P35(); // 开串口
     ticker_delay(10); // 等待串口稳定
     // systemWakeUp();
-    // printf("(out of sleep...)\n");
+    printf("(out of sleep...)\n");
 }
 
 void Gpio_IRQHandler(uint8_t u8Param)
@@ -143,7 +135,7 @@ void Gpio_IRQHandler(uint8_t u8Param)
     *((uint32_t *)((uint32_t)&M0P_GPIO->P0ICLR + 3 * 0x40)) = 0; // 清P3中断
     *((uint32_t *)((uint32_t)&M0P_GPIO->P0ICLR)) = 0;            // P0
 
-    // *((uint32_t *)((uint32_t)&M0P_GPIO->P2ICLR + 2 * 0x40)) = 0; // 清P26中断
+    // *((uint32_t *)((uint32_t)&M0P_GPIO->P2ICLR + 2 * 0x40)) = 0; // 清P2中断
 }
 
 void per_motor_set(uint8_t duty)

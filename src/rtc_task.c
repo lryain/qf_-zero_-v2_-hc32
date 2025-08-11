@@ -81,7 +81,7 @@ void rtc_task_init(stc_rtc_time_t *time)
     Rtc_DisableFunc(RtcCount); // 关闭计数
     Rtc_Init(&stcRtcConfig);   // 初始化RTC
     // 在初始化时注册
-    ticker_attch_ms(2000, led_flash_task, 0, "led_flash", NULL);
+    // ticker_attch_ms(2000, led_flash_task, 0, "led_flash", NULL);
 #if 0
     Gpio_SetFunc_RTC1HZ_P03();
     Clk_SetRTCAdjustClkFreq(CLK_XTH_VAL); // 以高速Pclk来进行补偿,此处要根据具体PCLK时钟源确定
