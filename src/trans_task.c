@@ -123,10 +123,10 @@ static void tic_cb(ticker_event_t *e)
         {
             scan_iic_devices();
         }
-        else if (strcmp(name, "set motor") == 0)
-        {
-            per_motor_set(dat[0]);
-        }
+        // else if (strcmp(name, "set motor") == 0)
+        // {
+        //     per_motor_set(dat[0]);
+        // }
         free((void *)name);
         free(dat);
     }

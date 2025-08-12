@@ -75,7 +75,7 @@ extern "C"
 #define btn_double_click_time_default 300     //双击识别间隔时间  默认300ms
 #define btn_triple_click_time_default 1000 // 3连击最大间隔时间（ms），可根据实际调整
 #define btn_long_press_time_default 400       //长按识别间隔时间  默认400ms
-#define btn_long_press_8s_default 5000       //长按8s识别间隔时间  默认5000ms
+#define btn_long_press_8s_default 3000       //长按8s识别间隔时间  默认3000ms
 #define btn_long_press_trig_interval_time 100 //长按时连续触发的每次触发间隔时间，默认100ms
 #define btn_shake_ms 20                       //抖动消除时间  默认20ms
 

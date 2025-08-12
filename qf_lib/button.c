@@ -29,6 +29,40 @@ static uint8_t button_event_read_ptr = 0;          // 缓冲区读取移动指�
 
 static uint8_t button_event_en_state = 0xff;
 
+// 新增：按键库复位函数，清空所有状态和事件缓冲
+void btn_reset(void)
+{
+    // memset(button_io_num, 255, BUTTON_NUM);
+    // memset(button_trig_level, 0, BUTTON_NUM);
+    // memset(button_now_level, 0, BUTTON_NUM);
+    // memset(button_low_count, 0, BUTTON_NUM);
+    // memset(button_high_count, 0, BUTTON_NUM);
+    // #if btn_long_press_en
+    // memset(long_flg, 0, BUTTON_NUM);
+    // memset(button_long_t, 0, BUTTON_NUM);
+    // memset(long_short_sent, 0, BUTTON_NUM);
+    // #endif
+    // #if btn_double_click_en
+    // memset(double_flg, 0, BUTTON_NUM);
+    // memset(button_double_t, 0, BUTTON_NUM);
+    // #endif
+    // memset(button_event_ret, btn_not_press, BUTTON_BUFFER_NUM);
+    // memset(button_event_io, 0, BUTTON_BUFFER_NUM);
+    // button_event_num = 0;
+    // button_event_write_ptr = 0;
+    // button_event_read_ptr = 0;
+    // button_event_en_state = 0xff;
+    // #if btn_long_press_trig_en
+    // long_trig_flg = 0;
+    // long_trig_type = btn_click;
+    // long_trig_time = btn_long_press_trig_interval_time;
+    // long_trig_count = 0;
+    // long_trig_long_count = 0;
+    // long_trig_long_time = btn_long_press_time_default * 3;
+    // #endif
+    for (int i = 0; i < BUTTON_NUM; i++)
+    button_now_level[i] = !button_trig_level[i]; // 强制设为未按下态
+}
 // static uint8_t init_flg = 1;
 
 #if btn_long_press_trig_en

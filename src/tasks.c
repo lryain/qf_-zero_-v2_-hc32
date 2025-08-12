@@ -4,7 +4,7 @@
 #include <string.h>
 
 // 关机延时（ms），非CM4建议5000~10000ms
-#define SHUTDOWN_DELAY_MS 8000
+#define SHUTDOWN_DELAY_MS 3000
 
 // 系统状态变量
 static uint8_t system_state = 0; // 0关机，1开机
@@ -58,6 +58,7 @@ static void btn_task()
                 gpio_set_level(sys_on, 0); // 强制断电
                 system_state = 0;
                 shutdown_pending = 0;
+                devices_deep_sleep_start();
                 // 立即返回，防止关机流程继续
                 return;
             }
@@ -95,6 +96,7 @@ void task_loop_handler()
         if (system_state == 0) {
             // 已经断电，直接清除关机流程
             shutdown_pending = 0;
+            devices_deep_sleep_start();
             return;
         }
         if (cm4_flag) {

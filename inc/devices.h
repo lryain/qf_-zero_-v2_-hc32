@@ -18,11 +18,11 @@ void devices_init(void);
  */
 void devices_deep_sleep_start(void);
 
-/**
- * @brief 设置振动器强度,仅在ESP休眠时可用
- *
- * @param duty 0-10
- */
-void per_motor_set(uint8_t duty);
+// /**
+//  * @brief 设置振动器强度,仅在ESP休眠时可用
+//  *
+//  * @param duty 0-10
+//  */
+// void per_motor_set(uint8_t duty);
 
 #endif
