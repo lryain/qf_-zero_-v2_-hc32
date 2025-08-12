@@ -3,9 +3,9 @@
 
 #include "user.h"
 #include "my_api.h"
-#include "trans_task.h"
+// #include "trans_task.h"
 #include "rtc_task.h"
-#include "bat_task.h"
+// #include "bat_task.h"
 
 
 /**

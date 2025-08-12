@@ -32,7 +32,7 @@ static void btn_task()
         case btn_click:
             // printf("(click)\n");
             if (system_state == 0) { // 关机状态
-                printf("(power on)\n");
+                // printf("(power on)\n");
                 gpio_set_level(sys_on, 1); // 上电
                 system_state = 1;
                 sys_dwn_active_l_delay(); // 延时恢复高电平
@@ -40,7 +40,7 @@ static void btn_task()
             break;
         case btn_double_click:
             if (system_state == 1) { // 开机状态
-                printf("(power off)\n");
+                // printf("(power off)\n");
                 // 通知树莓派关机
                 gpio_set_level(sys_dwn_active_l, 0); // 输出低电平
                 sys_dwn_active_l_delay(); // 延时恢复高电平
@@ -50,11 +50,11 @@ static void btn_task()
             }
             break;
         case btn_long_press:
-            printf("(long)\n");
+            // printf("(long)\n");
             break;
         case btn_long_press_8s:
             if (system_state == 1) { // 开机状态
-                printf("(force power off)\n");
+                // printf("(force power off)\n");
                 gpio_set_level(sys_on, 0); // 强制断电
                 system_state = 0;
                 shutdown_pending = 0;
@@ -70,7 +70,7 @@ static void btn_task()
 
 void tasks_init()
 {
-    esp_trans_init(); // 初始化主机通信
+    // esp_trans_init(); // 初始化主机通信
     stc_rtc_time_t time;
     memset(&time, 0, sizeof(stc_rtc_time_t));
     time.u8Year = 0x23;
@@ -104,7 +104,7 @@ void task_loop_handler()
                 shutdown_pending = 0;
                 system_state = 0;
                 // 关机完成，进入低功耗模式
-                // devices_deep_sleep_start();
+                devices_deep_sleep_start();
             }
         } else {
             // 非CM4，延时关机
@@ -113,7 +113,7 @@ void task_loop_handler()
                 shutdown_pending = 0;
                 system_state = 0;
                 // 关机完成，进入低功耗模式
-                // devices_deep_sleep_start();
+                devices_deep_sleep_start();
             }
         }
     }

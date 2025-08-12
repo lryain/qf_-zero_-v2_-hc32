@@ -292,7 +292,7 @@ void trans_packer_send_pack_fmt(trans_packer_handle_t *handle, const char *name,
 
 static void _trans_write_pack_cmd(trans_packer_handle_t *handle)
 {
-    printf("c%d\n",sizeof(trans_get_pack_t));
+    // printf("c%d\n",sizeof(trans_get_pack_t));
     trans_get_pack_t *tmp = trans_packer_malloc(sizeof(trans_get_pack_t));
     size_t i;
     if (tmp == NULL)

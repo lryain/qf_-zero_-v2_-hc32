@@ -1,7 +1,7 @@
 #include "rtc_task.h"
 #include "my_api.h"
 #include "trans_packer.h"
-#include "trans_task.h"
+// #include "trans_task.h"
 #include "devices.h"
 
 uint8_t flg;
@@ -18,15 +18,15 @@ static void RtcAlarmCb(void) // 闹钟回调函数
     flg |= 2;
 }
 
-void rtc_upload_time()
-{
-    stc_rtc_time_t time;
-    Rtc_ReadDateTime(&time);
-    uint8_t time_tmp[7] = {time.u8Year, time.u8Month, time.u8Day, time.u8DayOfWeek, time.u8Hour, time.u8Minute, time.u8Second};
-    for (size_t i = 0; i < sizeof(time_tmp); i++)
-        time_tmp[i] = Change_DateTimeFormat(time_tmp[i]);
-    trans_packer_send_pack(esp_trans_get_handle(), "time", time_tmp, sizeof(time_tmp));
-}
+// void rtc_upload_time()
+// {
+//     stc_rtc_time_t time;
+//     Rtc_ReadDateTime(&time);
+//     uint8_t time_tmp[7] = {time.u8Year, time.u8Month, time.u8Day, time.u8DayOfWeek, time.u8Hour, time.u8Minute, time.u8Second};
+//     for (size_t i = 0; i < sizeof(time_tmp); i++)
+//         time_tmp[i] = Change_DateTimeFormat(time_tmp[i]);
+//     trans_packer_send_pack(esp_trans_get_handle(), "time", time_tmp, sizeof(time_tmp));
+// }
 
 // 新增一个定时器任务
 void led_flash_task(void)

@@ -92,8 +92,7 @@ static void sys_tic_set(uint32_t sys_frq)
 
 void devices_init(void)
 {
-    // Clk_SetFunc(ClkFuncSwdPinIOEn, 1); // 关闭SWD接口
-
+    Clk_SetFunc(ClkFuncSwdPinIOEn, 1); // 关闭SWD接口
     stc_lpm_config_t stcLpmCfg; // 配置休眠模式为deep sleep
     stcLpmCfg.enSEVONPEND = SevPndDisable;
     stcLpmCfg.enSLEEPDEEP = SlpDpEnable;
@@ -103,7 +102,7 @@ void devices_init(void)
     sys_clk_init();                          // 初始化时钟
     sys_tic_set(Clk_GetHClkFreq());          // 初始化滴答定时器
     gpio_init();                             // 初始化gpio
-    iic_init();                              // 初始化iic
+    // iic_init();                              // 初始化iic
     btn_attach_read_io_func(gpio_get_level); // 初始化按键接口
     btn_attach(key_io, 0);                   // 注册按键
 
@@ -111,23 +110,30 @@ void devices_init(void)
 
 void devices_deep_sleep_start() // 开始休眠
 {
-    printf("(devices_deep_sleep_start...)\n");
-    gpio_set_mode(txd1_io, gpio_mode_input_pullup); // 关串口
+    // printf("(devices_deep_sleep_start...)\n");
+    // gpio_set_mode(txd1_io, gpio_mode_input_pullup); // 关串口
+
     gpio_set_irq(key_io, GpioIrqFalling, 1);        // 打开按键唤醒中断
-    
+    Clk_SetFunc(ClkFuncWkupRCH, TRUE);
+    SCB->SCR |= 0x4;       //sleepdeep
+    __NOP();
+    __NOP();
+    __NOP();
+    __NOP();
+    __NOP();
     Lpm_GotoLpmMode(); // 进入休眠
     // 唤醒
     while (Clk_GetClkRdy(ClkRCH) == 0) // 等待时钟稳定
         ;
     gpio_set_irq(key_io, GpioIrqFalling, 0);   // 关闭按键中断
 
-    gpio_set_mode(txd1_io, gpio_mode_output_pushpull); // 切为输出
-    gpio_set_level(txd1_io, 0);                        // 拉低唤醒ESP32
-    gpio_set_level(txd1_io, 1);
-    Gpio_SetFunc_UART1TX_P35(); // 开串口
-    ticker_delay(10); // 等待串口稳定
-    // systemWakeUp();
-    printf("(out of sleep...)\n");
+    // gpio_set_mode(txd1_io, gpio_mode_output_pushpull); // 切为输出
+    // gpio_set_level(txd1_io, 0);                        // 拉低唤醒ESP32
+    // gpio_set_level(txd1_io, 1);
+    // Gpio_SetFunc_UART1TX_P35(); // 开串口
+    // ticker_delay(10); // 等待串口稳定
+    // // systemWakeUp();
+    // printf("(out of sleep...)\n");
 }
 
 void Gpio_IRQHandler(uint8_t u8Param)

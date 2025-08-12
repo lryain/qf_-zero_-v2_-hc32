@@ -184,7 +184,6 @@ void btn_tic_ms(uint8_t _ms)
                 if (button_long_t[i] >= btn_long_press_8s_default && long_short_sent[i] == 0)
                 {
                     button_write_buffer(button_io_num[i], btn_long_press_8s);
-                    printf("(1. w ---> long_8s)\n");
                     long_flg[i] = 0;
                     long_short_sent[i] = 1;
                 }
@@ -227,7 +226,6 @@ void btn_tic_ms(uint8_t _ms)
                 if (long_flg[i] == 1 && button_long_t[i] >= btn_long_press_time_default && button_long_t[i] < btn_long_press_8s_default)
                 {
                     button_write_buffer(button_io_num[i], btn_long_press);
-                    printf("(2. w ---> btn_long_press)\n");
                 }
                 long_flg[i] = 0;
                 button_long_t[i] = 0;

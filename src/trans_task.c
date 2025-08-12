@@ -73,9 +73,9 @@ static void tic_cb(ticker_event_t *e)
         ring_buffer_read(ring_buffer, &tmp);
         trans_packer_push_byte(handle, tmp);
         // 转换成字符串输出，而不是16进制
-        char str[3];
-        sprintf(str, "%c", tmp);
-        printf("%s", str);
+        // char str[3];
+        // sprintf(str, "%c", tmp);
+        // printf("%s", str);
 
     }
     size_t result = trans_packer_get_pack_num(handle); // 获取编解码器接收到的包数量
@@ -91,7 +91,7 @@ static void tic_cb(ticker_event_t *e)
 
         if (strcmp(name, "get_time") == 0)
         {
-            rtc_upload_time();
+            // rtc_upload_time();
         }
         else if (strcmp(name, "hc_sleep") == 0)
         {
