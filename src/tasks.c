@@ -4,13 +4,12 @@
 #include <string.h>
 
 // 关机延时（ms），非CM4建议5000~10000ms
-#define SHUTDOWN_DELAY_MS 15000
+#define SHUTDOWN_DELAY_MS 12000
 
 // 系统状态变量
 static uint8_t system_state = 0; // 0关机，1开机
 static uint8_t shutdown_pending = 0;
 static uint8_t cm4_flag = 0; // 1为CM4，0为其它型号
-static uint8_t raspi5_flag = 0; // 1为raspi5，0为其它型号
 static uint32_t shutdown_timer = 0;
 
 // 定义一个函数来恢复高电平
@@ -35,14 +34,7 @@ static void btn_task()
             if (system_state == 0) { // 关机状态
                 // printf("(power on)\n");
                 gpio_set_level(sys_on, 1); // 上电
-                system_state = 1;
-                if (raspi5_flag) {
-                    // 如果是raspi5，通知树莓派开机
-                    sys_dwn_active_l_delay(); // 延时恢复高电平
-                } else {
-                    // 非raspi5，直接供电即可
-                }
-                
+                system_state = 1;               
             }
             break;
         case btn_double_click:

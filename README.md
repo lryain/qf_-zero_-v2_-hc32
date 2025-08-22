@@ -3,9 +3,9 @@
 ## TODO
 
 接下来实现
-1. 2秒重启
-2. 长按8秒强制关机
-3. 测试闹钟定时
+1. 2秒关机                 ok
+2. 长按8秒强制关机          ok
+3. cm4 RUN_PG 连接 pi_shutdown_done_pin 测试    N/A
 
 #### 介绍
 基于MDK的QF_ZERO_V2项目副处理器HC32的软件程序
