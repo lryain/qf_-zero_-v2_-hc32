@@ -16,7 +16,11 @@ static uint32_t shutdown_timer = 0;
 void sys_dwn_active_l_delay(void)
 {
     gpio_set_level(sys_dwn_active_l, 0); // 恢复高电平
-    ticker_delay(500);
+    ticker_delay(200);
+    gpio_set_level(sys_dwn_active_l, 1); // 恢复高电平
+    ticker_delay(200);
+    gpio_set_level(sys_dwn_active_l, 0); // 恢复高电平
+    ticker_delay(200);
     gpio_set_level(sys_dwn_active_l, 1); // 恢复高电平
 }
 
@@ -41,7 +45,7 @@ static void btn_task()
             if (system_state == 1) { // 开机状态
                 // printf("(power off)\n");
                 // 通知树莓派关机
-                gpio_set_level(sys_dwn_active_l, 0); // 输出低电平
+                // gpio_set_level(sys_dwn_active_l, 0); // 输出低电平
                 sys_dwn_active_l_delay(); // 延时恢复高电平
 
                 shutdown_pending = 1;
